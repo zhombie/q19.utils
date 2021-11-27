@@ -5,14 +5,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion '30.0.3'
+    compileSdkVersion 31
+    buildToolsVersion '31.0.0'
 
     defaultConfig {
         applicationId 'kz.q19.utils'
 
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 31
 
         versionCode 1
         versionName '1.0'
@@ -24,6 +24,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
 }
 
 dependencies {
@@ -33,11 +46,32 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     // AppCompat
-    implementation 'androidx.appcompat:appcompat:1.4.0-alpha03'
+    implementation 'androidx.appcompat:appcompat:1.4.0'
 
-    // Jetpack core
-    implementation 'androidx.core:core-ktx:1.6.0'
+    // Core
+    implementation 'androidx.core:core-ktx:1.7.0'
+
+    // Material Design Components
+    implementation "com.google.android.material:material:1.4.0"
+
+    // LeakCanary
+    // debugImplementation because LeakCanary should only run in debug builds.
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 
     // Library
-    implementation project(':utils')
+    implementation project(':activity')
+    implementation project(':context')
+    implementation project(':drawable')
+    implementation project(':file')
+    implementation project(':fragment')
+    implementation project(':json')
+    implementation project(':kotlin')
+    implementation project(':lifecycle:livedata')
+    implementation project(':location:compass')
+    implementation project(':location:core')
+    implementation project(':recyclerview')
+    implementation project(':text')
+    implementation project(':textview')
+    implementation project(':view')
+    implementation project(':window')
 }

@@ -7,19 +7,151 @@ buildscript {
     }
    
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath 'com.android.tools.build:gradle:7.0.3'
 
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
+/**
+ * Shared configs across subprojects
+ */
+ext.projectArtifactId = { project ->
+    if (
+        project.name == 'activity' ||
+        project.name == 'context' ||
+        project.name == 'drawable' ||
+        project.name == 'file' ||
+        project.name == 'fragment' ||
+        project.name == 'json' ||
+        project.name == 'kotlin' ||
+
+        // lifecycle
+        project.name == 'livedata' ||
+
+        // location
+        project.name == 'core' || project.name == 'compass' ||
+
+        project.name == 'recyclerview' ||
+        project.name == 'text' ||
+        project.name == 'textview' ||
+        project.name == 'view' ||
+        project.name == 'window'
+    ) {
+        return project.name
+    } else {
+        return null
     }
 }
+
+allprojects {
+    group = 'com.github.zhombie.utils'
+    version = '2.0.0'
+    project.ext.artifactId = rootProject.ext.projectArtifactId(project)
+}
+
+static def getSampleModuleName(project) {
+    if (project.name == "sample") {
+        println "Project [${project.name}] is sample module"
+        return project.name
+    }
+    return null
+}
+
+static def getParentFolderModuleName(project) {
+    def allProjects = project.getAllprojects()
+    if (allProjects.size() > 1) {
+        def name = allProjects.first().name
+        println "Project [${name}] has submodules"
+        return name
+    }
+    return null
+}
+
+/**
+ * Publishing and signing info
+ */
+subprojects { project ->
+    println "Subproject: ${project.name}"
+
+    if (getSampleModuleName(project) != null) return
+    if (getParentFolderModuleName(project) != null) return
+
+    apply plugin: 'com.android.library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'kotlin-android'
+
+    android {
+        compileSdkVersion 31
+        buildToolsVersion "31.0.0"
+
+        defaultConfig {
+            minSdkVersion 23
+            targetSdkVersion 31
+
+            versionCode 1
+            versionName "1.0"
+        }
+
+        buildTypes {
+            release {
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            }
+        }
+
+        buildFeatures {
+            buildConfig false
+        }
+
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_11
+            targetCompatibility JavaVersion.VERSION_11
+        }
+
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_11.toString()
+        }
+    }
+
+    publishing {
+        publications {
+            aar(MavenPublication) {
+//                from components.release
+
+                groupId project.group
+                artifactId project.ext.artifactId
+                version project.version
+
+                pom {
+                    name = project.name
+                    url = "https://github.com/zhombie/q19.utils"
+
+                    developers {
+                        developer {
+                            name = 'zhombie'
+                        }
+                    }
+                }
+
+                pom.withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    project.configurations.api.allDependencies.each { dependency ->
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', dependency.group)
+                        dependencyNode.appendNode('artifactId', dependency.name)
+                        dependencyNode.appendNode('version', dependency.version)
+                    }
+                }
+
+                afterEvaluate {
+                    artifact "$buildDir/outputs/aar/$project.name-release.aar"
+                }
+            }
+        }
+    }
+}
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir

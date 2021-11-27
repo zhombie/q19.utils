@@ -1,0 +1,15 @@
+android {
+    defaultConfig {
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    resourcePrefix 'window_'
+}
+
+dependencies {
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    // Core
+    implementation 'androidx.core:core-ktx:1.7.0'
+}

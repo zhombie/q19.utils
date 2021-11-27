@@ -1,3 +1,31 @@
-include ':utils'
-include ':sample'
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 rootProject.name = 'q19.utils'
+
+include ':sample'
+
+include ':activity'
+include ':context'
+include ':drawable'
+include ':file'
+include ':fragment'
+include ':json'
+include ':kotlin'
+
+include ':lifecycle:livedata'
+
+include ':location:core'
+include ':location:compass'
+
+include ':recyclerview'
+include ':text'
+include ':textview'
+include ':view'
+include ':window'
